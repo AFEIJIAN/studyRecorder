@@ -1,0 +1,64 @@
+<!-- Certification list -->
+<!doctype html>
+<html>
+	<head>
+		<title>Certifications</title>
+		<link rel="stylesheet" type="text/css" href="/css/index.css" />
+		<link rel="stylesheet" type="text/css" href="/css/cards.css" />
+		<link rel="stylesheet" type="text/css" href="/css/buttons.css" />
+		<script type="text/javascript" src="/js/interfaces/certs.js"></script>
+		<script type="text/javascript" src="/js/utils/date.js"></script>
+		<script type="text/javascript">
+			const certs = new Certifications();
+			let data = [];
+
+			async function onload() {
+				await loadData();
+			}
+
+			async function loadData() {
+				let data;
+				try {
+					data = await certs.list();
+				} catch (err) {
+					return alert(err);
+				}
+
+				let txt = "";
+
+				for (let o of data) {
+					txt += `<div class="cards" onclick="window.open('/certs/edit?uuid=${encodeURIComponent(o.uuid)}')">`;
+					txt += `<div class="title">${o.name}</div>`;
+					txt += `<div class="content">${o.institution}</div>`;
+					txt += `</div>`;
+				}
+
+				document.getElementById("list").innerHTML = txt;
+			}
+		</script>
+		<style>
+			.cards {
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body onload="onload();">
+		<header id="nav">
+			<h2 class="title">MyStudy</h2>
+			<div class="links">
+				<a class="active" href="#">Certifications</a>
+				<a href="/subjects">Subjects</a>
+				<a href="/assignments">Assignments</a>
+			</div>
+		</header>
+		<div id="header">
+			<h3 class="section">Certifications</h3>
+			<div class="actions">
+				<a href="/certs/edit" target="_blank" class="button primary"
+					>New</a
+				>
+			</div>
+		</div>
+		<div id="list"></div>
+	</body>
+</html>

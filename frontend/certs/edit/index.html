@@ -1,0 +1,147 @@
+<!-- Certification list -->
+<!doctype html>
+<html>
+	<head>
+		<title>Certification Details</title>
+		<link rel="stylesheet" type="text/css" href="/css/index.css" />
+		<link rel="stylesheet" type="text/css" href="/css/cards.css" />
+		<link rel="stylesheet" type="text/css" href="/css/buttons.css" />
+		<link rel="stylesheet" type="text/css" href="/css/form.css" />
+		<script type="text/javascript" src="/js/interfaces/certs.js"></script>
+		<script type="text/javascript" src="/js/utils/date.js"></script>
+		<script type="text/javascript">
+			const certs = new Certifications();
+			const params = new URLSearchParams(location.search);
+			let data = [];
+
+			async function onload() {
+				if (!params.get("uuid")) {
+					document.title = "New Certification";
+					document.getElementById("section").innerText =
+						"New Certification";
+				} else {
+					await loadField();
+				}
+
+				document.getElementById("form").onsubmit = async (e) => {
+					e.preventDefault();
+					await save();
+				};
+			}
+
+			async function loadField() {
+				if (!params.get("uuid")) return;
+
+				let cert;
+				try {
+					cert = await certs.get(params.get("uuid"));
+				} catch (err) {
+					return alert(err);
+				}
+
+				if (!cert) return alert("Certification not found");
+
+				let txt = "";
+
+				const name = document.getElementById("name");
+				const institution = document.getElementById("institution");
+				const start = document.getElementById("start");
+				const end = document.getElementById("end");
+
+				name.value = cert.name;
+				institution.value = cert.institution;
+				start.value = cert.start;
+				end.value = cert.end || "";
+
+				document.getElementById("delBtn").classList.remove("hidden");
+			}
+
+			async function save() {
+				const id = params.get("uuid");
+
+				const name = document.getElementById("name");
+				const institution = document.getElementById("institution");
+				const start = document.getElementById("start");
+				const end = document.getElementById("end");
+
+				let cert = {
+					name: name.value,
+					institution: institution.value,
+					start: start.value,
+					end: end.value,
+				};
+
+				if (id) {
+					try {
+						await certs.update(id, cert);
+						location.reload();
+					} catch (err) {
+						alert(err);
+					}
+
+				} else {
+					try {
+						let c = await certs.create(cert);
+						location.href = `/certs/edit?uuid=${encodeURIComponent(c.uuid)}`;
+					} catch (err) {
+						alert(err);
+					}
+				}
+			}
+
+			async function del() {
+				if (!confirm("Delete this certification? Action cannot be undone.")) return;
+
+				const id = params.get("uuid");
+
+				try {
+					await certs.delete(id);
+				} catch (err) {
+					return alert(err);
+				}
+
+				location.href = "/certs";
+			}
+		</script>
+		<style>
+			.hidden {
+				display: none !important;
+			}
+		</style>
+	</head>
+	<body onload="onload();">
+		<header id="nav">
+			<h2 class="title">MyStudy</h2>
+			<div class="links">
+				<a class="active" href="/certs">Certifications</a>
+				<a href="/subjects">Subjects</a>
+				<a href="/assignments">Assignments</a>
+			</div>
+		</header>
+		<div id="header">
+			<h3 id="section" class="section">Certification Details</h3>
+			<div class="actions">
+				<button id="delBtn" onclick="del();" class="button error hidden">Delete</button>
+			</div>
+		</div>
+		<form id="form">
+			<label>
+				Name:
+				<input type="text" id="name" />
+			</label>
+			<label>
+				Institution:
+				<input type="text" id="institution" />
+			</label>
+			<label>
+				Start Date:
+				<input type="date" id="start" />
+			</label>
+			<label>
+				End Date:
+				<input type="date" id="end" />
+			</label>
+			<button type="submit" class="button success">Save</button>
+		</form>
+	</body>
+</html>

@@ -1,0 +1,35 @@
+.button {
+	text-decoration: none;
+	color: black;
+	padding: 7px;
+	border: solid 1px transparent;
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.button.primary {
+	color: gray;
+	background: cyan
+}
+
+.button.primary:hover {
+	background: darkcyan;
+}
+
+.button.success {
+	color: white;
+	background: lightgreen;
+}
+
+.button.success:hover {
+	background: green;
+}
+
+.button.error {
+	color: white;
+	background: red;
+}
+
+.button.error:hover {
+	background: crimson;
+}
